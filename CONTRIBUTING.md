@@ -1,12 +1,12 @@
 # Contributing
 
-The browser only gets `public/`. Review logic lives in `lib/` and is called from `functions/`.
+The browser only gets `public/`. Review logic lives in `lib/` and is called from the Worker (`src/index.js` + `functions/api/`).
 
 ## Setup
 
 ```bash
 cp .dev.vars.example .dev.vars
-npx wrangler pages dev public --port 4173
+npx wrangler dev --port 4173
 npm test
 ```
 
@@ -18,7 +18,7 @@ npm test
 | GitHub REST | `lib/github.js` |
 | Model calls | `lib/ai.js` |
 | Diff filtering | `lib/diff.js` |
-| HTTP routes | `functions/api/` |
+| HTTP routes | `functions/api/` and `src/index.js` |
 | Layout / copy | `public/index.html`, `public/css/app.css` |
 | Client wiring | `public/js/app.js` |
 

@@ -2,7 +2,7 @@
 
 ## What visitors can see
 
-`public/` is the only tree served as static files. The review prompt, GitHub fetching, and provider calls live in `lib/` and run inside Pages Functions. GitHub access tokens are stored in an **HttpOnly** cookie, not in JavaScript storage.
+`public/` is the only tree served as static files. The review prompt, GitHub fetching, and provider calls live in `lib/` and run inside the Worker. GitHub access tokens are stored in an **HttpOnly** cookie, not in JavaScript storage.
 
 ## What this app stores
 

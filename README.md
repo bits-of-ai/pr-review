@@ -2,7 +2,7 @@
 
 A GitHub pull request reviewer powered by **Claude** or **OpenAI**.
 
-The UI is static. The review prompt, GitHub diff fetch, and model calls run in **Cloudflare Pages Functions**, so visitors cannot read that code in the browser.
+The UI is static. The review prompt, GitHub diff fetch, and model calls run in a **Cloudflare Worker**, so visitors cannot read that code in the browser.
 
 ## Why Cloudflare Pages (not Netlify, Vercel, or GitHub Pages)
 
@@ -42,7 +42,7 @@ flowchart LR
 ```bash
 cp .dev.vars.example .dev.vars
 # fill GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET (and optional AI keys)
-npx wrangler pages dev public --port 4173
+npx wrangler dev --port 4173
 npm test
 ```
 
@@ -50,32 +50,21 @@ Open http://127.0.0.1:4173. Plain `python3 -m http.server` will not run `/api/*`
 
 GitHub OAuth App callback for local: `http://127.0.0.1:4173/api/oauth/callback`.
 
-## Deploy on Cloudflare Pages
+## Deploy on Cloudflare
 
-Connect the GitHub repo in the dashboard. **Do not set a deploy command.** Cloudflare’s Git integration already uploads `public/` and `functions/`. Running `npx wrangler deploy` in the build will fail (`Missing entry-point to Worker script`).
+This is **not** caused by a missing GitHub client ID or secret. Those are used after the site is live. The build failed because Cloudflare runs `npx wrangler deploy`, which needs `main` and `[assets]` in `wrangler.toml` (now in this repo).
 
-1. Dashboard → **Workers & Pages** → **Create** → **Pages** → **Import an existing Git repository** → `bits-of-ai/pr-review`.
-2. Build settings (this is the part that was wrong if the log shows `npx wrangler deploy`):
+1. **Commit and push** this repo to `bits-of-ai/pr-review` (including `src/index.js` and the updated `wrangler.toml`).
+2. In Cloudflare, keep **Deploy command** as `npx wrangler deploy` if that is already set.
+3. Retry the deployment. It should succeed without GitHub OAuth secrets.
+4. After the site is up, add environment variables (see below), then create the GitHub OAuth App using the live URL.
 
-| Field | Value |
-| --- | --- |
-| Framework preset | None |
-| Build command | *empty* |
-| **Deploy command** | **empty — delete `npx wrangler deploy`** |
-| Build output directory | `public` |
-| Root directory | `/` |
+[Register a GitHub OAuth App](https://github.com/settings/applications/new):
 
-3. **Save and retry deployment.** You should see the site at `https://<project>.pages.dev`.
+- Homepage URL: `https://<project>.pages.dev` or your `*.workers.dev` URL
+- Authorization callback URL: `https://<same-host>/api/oauth/callback`
 
-4. [Register a GitHub OAuth App](https://github.com/settings/applications/new):
-   - Homepage URL: `https://<project>.pages.dev`
-   - Authorization callback URL: `https://<project>.pages.dev/api/oauth/callback`
-
-Wrangler (`npx wrangler login`, `npx wrangler pages deploy`) is only for deploying from your laptop. You do not need it when Git is connected.
-
-If you created a **Worker** instead of a **Pages** project, create a new Pages project with the settings above. This app uses Pages Functions (`functions/`), not a Worker `main` script.
-
-5. In the Pages project **Settings → Environment variables** (Production):
+5. After deploy, **Settings → Variables and Secrets** (Production):
 
 | Name | Secret? | Purpose |
 | --- | --- | --- |
@@ -88,8 +77,8 @@ If you created a **Worker** instead of a **Pages** project, create a new Pages p
 CLI equivalent:
 
 ```bash
-npx wrangler pages secret put GITHUB_CLIENT_SECRET --project-name pr-review
-npx wrangler pages secret put ANTHROPIC_API_KEY --project-name pr-review
+npx wrangler secret put GITHUB_CLIENT_SECRET
+npx wrangler secret put ANTHROPIC_API_KEY
 ```
 
 Put `GITHUB_CLIENT_ID` in `[vars]` in `wrangler.toml` or in the dashboard.
@@ -110,10 +99,9 @@ Until OAuth secrets exist, **Authorize with GitHub** stays disabled. Users can p
 
 ```
 public/             what the browser can download
-  index.html
-  css/  js/         UI only
-functions/api/      Pages Functions (not a public static folder)
-lib/                review prompt, GitHub, AI — bundled into Functions, not served
+src/index.js        Worker: API routes + static assets
+functions/api/      route handlers used by the Worker
+lib/                review prompt, GitHub, AI — not served as static files
 tests/
 wrangler.toml
 ```
