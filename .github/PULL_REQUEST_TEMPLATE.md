@@ -1,9 +1,7 @@
-## Summary
+## What changed
 
-- 
-
-## Test plan
+## How you checked
 
 - [ ] `npm test`
-- [ ] Local `python3 -m http.server 4173` still loads the form
-- [ ] (If auth/UI changed) GitHub token or OAuth path still works
+- [ ] If you changed the website or `/api`: `npx wrangler dev --port 4173` still works
+- [ ] No tokens, API keys, or `.dev.vars` in this PR
