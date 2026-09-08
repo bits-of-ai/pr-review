@@ -31,9 +31,9 @@ export const PROVIDERS = [
     models: [
       { id: "openrouter/free", label: "Free router (recommended)" },
       { id: "cohere/north-mini-code:free", label: "North Mini Code (free)" },
+      { id: "thinkingmachines/inkling:free", label: "Inkling (free)" },
       { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B (free)" },
       { id: "nvidia/nemotron-3.5-lightning:free", label: "Nemotron 3.5 Lightning (free)" },
-      { id: "poolside/laguna-s-2.1:free", label: "Laguna S 2.1 (free)" },
     ],
   },
   {
@@ -42,10 +42,10 @@ export const PROVIDERS = [
     keyLabel: "Google AI Studio API key",
     docs: "https://aistudio.google.com/apikey",
     models: [
-      { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash (recommended)" },
-      { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-      { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite (fast)" },
-      { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+      { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash (recommended)" },
+      { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
+      { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash" },
+      { id: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash Lite (fast)" },
     ],
   },
   {
@@ -54,10 +54,9 @@ export const PROVIDERS = [
     keyLabel: "Groq API key",
     docs: "https://console.groq.com/keys",
     models: [
-      { id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (recommended)" },
-      { id: "openai/gpt-oss-120b", label: "GPT OSS 120B" },
+      { id: "openai/gpt-oss-120b", label: "GPT OSS 120B (recommended)" },
       { id: "openai/gpt-oss-20b", label: "GPT OSS 20B (fast)" },
-      { id: "llama-3.1-8b-instant", label: "Llama 3.1 8B Instant" },
+      { id: "qwen/qwen3.8-27b", label: "Qwen 3.8 27B" },
     ],
   },
   {
@@ -80,7 +79,6 @@ export const PROVIDERS = [
     models: [
       { id: "gpt-oss-120b", label: "GPT OSS 120B (recommended)" },
       { id: "qwen-3.8-27b", label: "Qwen 3.8 27B" },
-      { id: "gemma-4-31b", label: "Gemma 4 31B" },
     ],
   },
 ];

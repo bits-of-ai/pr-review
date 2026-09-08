@@ -70,15 +70,13 @@ describe("provider response parsing", () => {
     );
   });
 
-  it("reads Gemini text parts and skips thoughts", () => {
+  it("reads Gemini Interactions output and skips thoughts", () => {
     assert.equal(
       geminiText({
-        candidates: [
-          {
-            content: {
-              parts: [{ thought: true, text: "secret" }, { text: "visible" }],
-            },
-          },
+        status: "completed",
+        steps: [
+          { type: "thought", signature: "x" },
+          { type: "model_output", content: [{ type: "text", text: "visible" }] },
         ],
       }),
       "visible",
