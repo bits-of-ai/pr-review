@@ -1,0 +1,9 @@
+name = "pr-review"
+pages_build_output_dir = "public"
+compatibility_date = "2026-05-03"
+
+# Public values. Put secrets in the Cloudflare dashboard or:
+#   npx wrangler pages secret put GITHUB_CLIENT_SECRET --project-name pr-review
+[vars]
+GITHUB_CLIENT_ID = ""
+OAUTH_SCOPE = "repo read:user"

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PR Review — AI pull request reviewer</title>
+    <meta
+      name="description"
+      content="Review a GitHub pull request with Claude or OpenAI. The review pipeline runs on the server."
+    />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./css/app.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to form</a>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="./">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="currentColor" />
+            <path
+              d="M10 8.5h7.2c2.7 0 4.8 1.9 4.8 4.4 0 2.4-2.1 4.3-4.8 4.3H13.2V23.5H10V8.5zm3.2 6.3h3.8c1.1 0 1.9-.8 1.9-1.9s-.8-1.9-1.9-1.9h-3.8v3.8z"
+              fill="#0d1117"
+            />
+          </svg>
+          <span>
+            <strong>PR Review</strong>
+            <small>AI review for GitHub pull requests</small>
+          </span>
+        </a>
+
+        <div class="auth" id="auth-guest">
+          <button class="btn btn-primary" type="button" id="authorize-btn">
+            Authorize with GitHub
+          </button>
+        </div>
+
+        <div class="auth auth-user" id="auth-user" hidden>
+          <img id="user-avatar" width="28" height="28" alt="" />
+          <span id="user-name"></span>
+          <button class="btn btn-quiet" type="button" id="sign-out-btn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="page">
+      <p class="lede">
+        Paste a pull request, add optional context, and send it for review. The prompt, GitHub
+        diff fetch, and model call run on the server — they are not shipped to the browser.
+      </p>
+
+      <div id="banner" class="banner" hidden role="status" aria-live="polite"></div>
+
+      <form id="review-form" class="panel">
+        <section class="block">
+          <h2>GitHub</h2>
+          <p id="oauth-hint" class="hint">
+            Authorize is disabled until this deployment has GitHub OAuth secrets. You can still
+            paste a personal access token.
+          </p>
+          <div class="token-row">
+            <label class="sr-only" for="token-input">GitHub personal access token</label>
+            <input
+              id="token-input"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="ghp_… personal access token"
+            />
+            <button class="btn" type="button" id="save-token-btn">Use token</button>
+          </div>
+          <p class="hint">
+            Token needs the <code>repo</code> scope for private repositories.
+            <a id="token-docs" href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">Create a token</a>
+          </p>
+        </section>
+
+        <section class="block">
+          <h2>Pull request</h2>
+          <label for="pr-url">PR URL</label>
+          <input
+            id="pr-url"
+            type="url"
+            inputmode="url"
+            placeholder="https://github.com/owner/repo/pull/123"
+          />
+          <div class="grid-2">
+            <div>
+              <label for="repo">Repository</label>
+              <input id="repo" type="text" placeholder="owner/repo" autocomplete="off" />
+            </div>
+            <div>
+              <label for="number">PR number</label>
+              <input id="number" type="number" min="1" step="1" placeholder="123" />
+            </div>
+          </div>
+          <label for="context">Additional context <span class="optional">(optional)</span></label>
+          <textarea
+            id="context"
+            rows="5"
+            placeholder="What should the model pay attention to? Known constraints, areas of risk, style of review…"
+          ></textarea>
+        </section>
+
+        <section class="block">
+          <h2>Model</h2>
+          <div class="grid-2">
+            <div>
+              <label for="provider">Provider</label>
+              <select id="provider"></select>
+            </div>
+            <div>
+              <label for="model">Model</label>
+              <select id="model"></select>
+            </div>
+          </div>
+          <label for="api-key"><span id="api-key-label">API key</span></label>
+          <input id="api-key" type="password" autocomplete="off" spellcheck="false" />
+          <p class="hint" id="key-optional" hidden>This site has a hosted key; yours is optional and overrides it.</p>
+          <p class="hint">
+            Bring your own key unless the host configured one.
+            <a id="api-key-docs" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Get a key</a>
+          </p>
+          <label class="check">
+            <input id="remember" type="checkbox" />
+            Remember API keys in this browser. GitHub tokens are stored in an HttpOnly cookie, not in JavaScript.
+          </label>
+        </section>
+
+        <div class="actions">
+          <button class="btn btn-primary btn-lg" type="submit" id="review-btn">Review pull request</button>
+          <p id="status" class="status" hidden></p>
+        </div>
+      </form>
+
+      <section id="results" class="panel results" hidden>
+        <header class="results-head">
+          <div>
+            <a id="pr-title" class="pr-title" href="#" target="_blank" rel="noopener noreferrer"></a>
+            <p id="pr-meta" class="pr-meta"></p>
+          </div>
+          <div class="results-actions">
+            <button class="btn" type="button" id="copy-btn">Copy Markdown</button>
+            <button class="btn" type="button" id="post-btn">Comment on PR</button>
+          </div>
+        </header>
+        <p id="verdict" class="verdict"></p>
+        <div id="summary" class="prose"></div>
+        <p id="unparsed-note" class="hint" hidden>
+          The model did not return structured JSON, so the raw reply is shown as a single finding.
+        </p>
+        <ol id="findings" class="findings"></ol>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Review prompt and provider calls run on Cloudflare Pages Functions. GitHub access uses an
+        HttpOnly cookie.
+      </p>
+    </footer>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
