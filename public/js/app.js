@@ -34,12 +34,8 @@ async function init() {
   el("token-docs").href = TOKEN_URL;
 
   const params = new URLSearchParams(window.location.search);
-  if (params.get("auth") === "ok") {
-    showBanner("Signed in with GitHub.", "success");
-  }
-  if (params.get("auth_error")) {
-    showBanner(params.get("auth_error"), "error");
-  }
+  const authOk = params.get("auth") === "ok";
+  const authError = params.get("auth_error");
   if (params.has("auth") || params.has("auth_error")) {
     history.replaceState({}, "", window.location.pathname);
   }
@@ -49,21 +45,28 @@ async function init() {
   } catch {
     state.config = { oauthConfigured: false, hostedKeys: { anthropic: false, openai: false } };
   }
-  updateOauthButton();
-  updateKeyHint();
 
   try {
-    const session = await api("/api/session");
-    state.user = session.user;
-    if (session.user && !params.get("auth_error")) {
-      if (params.get("auth") !== "ok") {
-        /* already signed in from cookie */
-      }
+    state.user = await loadSessionUser();
+    if (authOk && !state.user) {
+      await wait(200);
+      state.user = await loadSessionUser();
     }
   } catch {
     state.user = null;
   }
+
+  updateOauthButton();
+  updateKeyHint();
   updateAuthUi();
+
+  if (authError) {
+    showBanner(authError, "error");
+  } else if (authOk && state.user) {
+    showBanner(`Signed in as ${state.user.login}.`, "success");
+  } else if (authOk && !state.user) {
+    showBanner("GitHub approval succeeded, but this browser did not keep the session. Try Authorize again, or paste a token.", "error");
+  }
 }
 
 function bind() {
@@ -75,7 +78,7 @@ function bind() {
     await api("/api/auth/logout", { method: "POST", body: "{}" });
     state.user = null;
     updateAuthUi();
-    showBanner("Signed out.", "success");
+    showBanner("Deauthorized. This site no longer has GitHub access.", "success");
   });
 
   el("save-token-btn").addEventListener("click", onSaveToken);
@@ -137,13 +140,17 @@ function updateProviderUi() {
 function updateOauthButton() {
   const button = el("authorize-btn");
   const hint = el("oauth-hint");
+  if (state.user) {
+    hint.hidden = true;
+    return;
+  }
   if (state.config.oauthConfigured) {
     button.disabled = false;
     button.title = "Authorize this app with GitHub";
     hint.hidden = true;
   } else {
     button.disabled = true;
-    button.title = "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET on Cloudflare Pages";
+    button.title = "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in Cloudflare";
     hint.hidden = false;
   }
 }
@@ -158,11 +165,26 @@ function updateAuthUi() {
   const signedIn = Boolean(state.user);
   el("auth-guest").hidden = signedIn;
   el("auth-user").hidden = !signedIn;
+  el("pat-block").hidden = signedIn;
+  el("github-connected").hidden = !signedIn;
+  el("post-btn").hidden = !signedIn;
   if (signedIn) {
     el("user-name").textContent = state.user.login;
     el("user-avatar").src = state.user.avatar_url;
     el("user-avatar").alt = "";
+    el("github-connected").textContent =
+      `Connected as ${state.user.login}. You do not need a personal access token.`;
   }
+  updateOauthButton();
+}
+
+async function loadSessionUser() {
+  const session = await api("/api/session");
+  return session.user || null;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function onSaveToken() {

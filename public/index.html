@@ -39,41 +39,45 @@
         <div class="auth auth-user" id="auth-user" hidden>
           <img id="user-avatar" width="28" height="28" alt="" />
           <span id="user-name"></span>
-          <button class="btn btn-quiet" type="button" id="sign-out-btn">Sign out</button>
+          <button class="btn btn-quiet" type="button" id="sign-out-btn">Deauthorize</button>
         </div>
       </div>
     </header>
 
     <main id="main" class="page">
       <p class="lede">
-        Paste a pull request, add optional context, and send it for review. The prompt, GitHub
-        diff fetch, and model call run on the server — they are not shipped to the browser.
+        Paste a public pull request to review it. Sign in with GitHub only for private repos or to
+        post a comment.
       </p>
 
       <div id="banner" class="banner" hidden role="status" aria-live="polite"></div>
 
       <form id="review-form" class="panel">
-        <section class="block">
+        <section class="block" id="github-block">
           <h2>GitHub</h2>
+          <p id="github-connected" class="hint" hidden></p>
           <p id="oauth-hint" class="hint">
-            Authorize is disabled until this deployment has GitHub OAuth secrets. You can still
-            paste a personal access token.
+            Public pull requests do not need GitHub sign-in. Authorize for private repos, or paste a
+            token if the button above is disabled.
           </p>
-          <div class="token-row">
-            <label class="sr-only" for="token-input">GitHub personal access token</label>
-            <input
-              id="token-input"
-              type="password"
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="ghp_… personal access token"
-            />
-            <button class="btn" type="button" id="save-token-btn">Use token</button>
+          <div id="pat-block">
+            <div class="token-row">
+              <label class="sr-only" for="token-input">GitHub personal access token</label>
+              <input
+                id="token-input"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="ghp_… personal access token"
+              />
+              <button class="btn" type="button" id="save-token-btn">Use token</button>
+            </div>
+            <p class="hint">
+              Optional. Needed for private repositories if you are not signed in. Use the
+              <code>repo</code> scope.
+              <a id="token-docs" href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">Create a token</a>
+            </p>
           </div>
-          <p class="hint">
-            Token needs the <code>repo</code> scope for private repositories.
-            <a id="token-docs" href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">Create a token</a>
-          </p>
         </section>
 
         <section class="block">
@@ -124,7 +128,7 @@
           </p>
           <label class="check">
             <input id="remember" type="checkbox" />
-            Remember API keys in this browser. GitHub tokens are stored in an HttpOnly cookie, not in JavaScript.
+            Remember API keys in this browser. GitHub sign-in stays in a server cookie, not in this form.
           </label>
         </section>
 
@@ -156,8 +160,7 @@
 
     <footer class="footer">
       <p>
-        Review prompt and provider calls run on Cloudflare Pages Functions. GitHub access uses an
-        HttpOnly cookie.
+        Review and GitHub sign-in run on the server. Your GitHub token is kept in a cookie, not in page scripts.
       </p>
     </footer>
 

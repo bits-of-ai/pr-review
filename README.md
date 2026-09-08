@@ -9,11 +9,10 @@ Code: [https://github.com/bits-of-ai/pr-review](https://github.com/bits-of-ai/pr
 
 ## How to use it
 
-1. Sign in with GitHub, or paste a GitHub personal access token.
-2. Paste a PR link, or enter `owner/repo` and the PR number.
-3. Add extra notes if you want (optional).
-4. Pick Claude or OpenAI. Paste an API key unless the host already added one.
-5. Click **Review pull request**. You can copy the result or post it as a PR comment.
+1. Paste a public PR link (or `owner/repo` and the number). Sign in only for private repos or to comment.
+2. Add extra notes if you want (optional).
+3. Pick Claude or OpenAI. Paste an API key unless the host already added one.
+4. Click **Review pull request**. Copy the result, or sign in to post it as a PR comment.
 
 ## Run it on your computer
 

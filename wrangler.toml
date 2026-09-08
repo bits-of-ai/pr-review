@@ -8,8 +8,7 @@ compatibility_date = "2026-05-03"
 directory = "./public"
 binding = "ASSETS"
 
-# Public values. Put secrets in the Cloudflare dashboard:
-#   GITHUB_CLIENT_SECRET, ANTHROPIC_API_KEY, OPENAI_API_KEY
+# Put GITHUB_CLIENT_ID in the Cloudflare dashboard, not here.
+# An empty value in this file would wipe the dashboard value on deploy.
 [vars]
-GITHUB_CLIENT_ID = ""
 OAUTH_SCOPE = "repo read:user"

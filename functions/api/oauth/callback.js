@@ -49,8 +49,9 @@ export async function onRequestGet({ request, env }) {
   }
 
   const headers = new Headers();
-  headers.append("Location", `${home}?auth=ok`);
-  headers.append("Set-Cookie", setGithubCookie(token, request.url));
+  headers.set("Location", `${home}?auth=ok`);
+  // GitHub token last so it is kept if the runtime keeps only one Set-Cookie.
   headers.append("Set-Cookie", clearOauthStateCookie(request.url));
-  return new Response(null, { status: 302, headers });
+  headers.append("Set-Cookie", setGithubCookie(token, request.url));
+  return new Response(null, { status: 303, headers });
 }

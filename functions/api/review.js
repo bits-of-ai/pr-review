@@ -12,9 +12,6 @@ export async function onRequestPost({ request, env }) {
   const model = String(body.model || "").slice(0, 80);
   const apiKey = resolveApiKey(env, provider, body.apiKey);
 
-  if (!token) {
-    return json({ error: "Authorize with GitHub or paste a personal access token." }, 401);
-  }
   if (!ref) {
     return json(
       { error: "Enter a repository (owner/repo) and pull request number, or paste a PR URL." },
