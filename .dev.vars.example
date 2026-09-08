@@ -1,6 +1,11 @@
-# Copy to .dev.vars for `npx wrangler pages dev` (never commit .dev.vars)
+# Copy to .dev.vars for local `npm start` (never commit .dev.vars)
 
 GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
+OPENROUTER_API_KEY=
+GOOGLE_AI_API_KEY=
+GROQ_API_KEY=
+MISTRAL_API_KEY=
+CEREBRAS_API_KEY=

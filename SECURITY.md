@@ -7,7 +7,7 @@
 ## What this app stores
 
 - GitHub OAuth / PAT: HttpOnly cookie `prreview_gh` (8 hours).
-- Optional user AI keys: `sessionStorage` or `localStorage` if the user opts in. Prefer setting `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` on the server.
+- Optional user AI keys: `sessionStorage` or `localStorage` if the user opts in. Prefer setting hosted provider keys on the server (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `GOOGLE_AI_API_KEY`, `GROQ_API_KEY`, `MISTRAL_API_KEY`, `CEREBRAS_API_KEY`).
 - Cloudflare holds `GITHUB_CLIENT_SECRET` and any hosted provider keys. They are not logged by this code.
 
 ## Repository visibility

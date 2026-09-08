@@ -15,7 +15,7 @@ const TOKEN_URL =
 
 const state = {
   user: null,
-  config: { oauthConfigured: false, hostedKeys: { anthropic: false, openai: false } },
+  config: { oauthConfigured: false, hostedKeys: {} },
   review: null,
   markdown: "",
   ref: null,
@@ -43,7 +43,7 @@ async function init() {
   try {
     state.config = await api("/api/config");
   } catch {
-    state.config = { oauthConfigured: false, hostedKeys: { anthropic: false, openai: false } };
+    state.config = { oauthConfigured: false, hostedKeys: {} };
   }
 
   try {
@@ -133,8 +133,7 @@ function updateProviderUi() {
   el("api-key").placeholder = provider.keyLabel;
   el("api-key-label").textContent = provider.keyLabel;
   el("api-key-docs").href = provider.docs;
-  const stored = getProviderKey(provider.id);
-  if (stored) el("api-key").value = stored;
+  el("api-key").value = getProviderKey(provider.id);
 }
 
 function updateOauthButton() {

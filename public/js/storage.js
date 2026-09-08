@@ -1,10 +1,13 @@
 const KEYS = {
-  anthropicKey: "prreview.anthropicKey",
-  openaiKey: "prreview.openaiKey",
   provider: "prreview.provider",
   model: "prreview.model",
   repo: "prreview.repo",
   rememberKeys: "prreview.rememberKeys",
+};
+
+const LEGACY_KEY = {
+  anthropic: "prreview.anthropicKey",
+  openai: "prreview.openaiKey",
 };
 
 function store(remember) {
@@ -26,6 +29,10 @@ function write(key, value, remember) {
   target.setItem(key, value);
 }
 
+function keySlot(provider) {
+  return `prreview.key.${provider}`;
+}
+
 export function rememberSecrets() {
   return localStorage.getItem(KEYS.rememberKeys) === "1";
 }
@@ -36,11 +43,15 @@ export function setRememberSecrets(on) {
 }
 
 export function getProviderKey(provider) {
-  return read(provider === "openai" ? KEYS.openaiKey : KEYS.anthropicKey) || "";
+  const current = read(keySlot(provider));
+  if (current) return current;
+  const legacy = LEGACY_KEY[provider];
+  return (legacy && read(legacy)) || "";
 }
 
 export function setProviderKey(provider, key, remember = rememberSecrets()) {
-  write(provider === "openai" ? KEYS.openaiKey : KEYS.anthropicKey, key, remember);
+  write(keySlot(provider), key, remember);
+  if (LEGACY_KEY[provider]) write(LEGACY_KEY[provider], key, remember);
 }
 
 export function getPrefs() {

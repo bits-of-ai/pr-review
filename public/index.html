@@ -6,7 +6,7 @@
     <title>PR Review — AI pull request reviewer</title>
     <meta
       name="description"
-      content="Review a GitHub pull request with Claude or OpenAI. The review pipeline runs on the server."
+      content="Review a GitHub pull request with Claude, OpenAI, OpenRouter, Google AI Studio, Groq, and more. The review pipeline runs on the server."
     />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./css/app.css" />
@@ -123,7 +123,7 @@
           <input id="api-key" type="password" autocomplete="off" spellcheck="false" />
           <p class="hint" id="key-optional" hidden>This site has a hosted key; yours is optional and overrides it.</p>
           <p class="hint">
-            Bring your own key unless the host configured one.
+            Bring your own key unless the host configured one. OpenRouter, Google AI Studio, Groq, and Cerebras have free keys with rate limits.
             <a id="api-key-docs" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Get a key</a>
           </p>
           <label class="check">

@@ -34,7 +34,7 @@ body:
         - Sign in with GitHub
         - Personal access token
         - Loading a pull request
-        - Running a review (Claude / OpenAI)
+        - Running a review
         - Copy or comment on the PR
         - Something else
     validations:

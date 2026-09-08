@@ -20,7 +20,7 @@ Do not commit `.dev.vars` or any API keys.
 | --- | --- |
 | How the review is written | `lib/prompt.js` |
 | How GitHub is called | `lib/github.js` |
-| How Claude / OpenAI is called | `lib/ai.js` |
+| How an AI provider is called | `lib/ai.js`, `lib/providers.js` |
 | Which files are skipped in the diff | `lib/diff.js` |
 | A `/api/...` URL | `functions/api/` and `src/index.js` |
 | Layout or wording | `public/index.html`, `public/css/app.css` |

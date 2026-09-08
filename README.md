@@ -1,6 +1,6 @@
 # PR Review
 
-Review a GitHub pull request with Claude or OpenAI.
+Review a GitHub pull request with Claude, OpenAI, OpenRouter, Google AI Studio, Groq, Mistral, or Cerebras.
 
 The form you see in the browser is only the website. Fetching the PR, building the review, and calling the AI all run on the server.
 
@@ -11,7 +11,7 @@ Code: [https://github.com/bits-of-ai/pr-review](https://github.com/bits-of-ai/pr
 
 1. Paste a public PR link (or `owner/repo` and the number). Sign in only for private repos or to comment.
 2. Add extra notes if you want (optional).
-3. Pick Claude or OpenAI. Paste an API key unless the host already added one.
+3. Pick a provider. OpenRouter, Google AI Studio, Groq, and Cerebras offer free API keys (rate-limited). Paste a key unless the host already added one.
 4. Click **Review pull request**. Copy the result, or sign in to post it as a PR comment.
 
 ## Run it on your computer
@@ -45,7 +45,7 @@ After the first successful deploy:
 2. In Cloudflare, open the project → **Settings → Variables and Secrets** and add:
    - `GITHUB_CLIENT_ID` (from the GitHub app)
    - `GITHUB_CLIENT_SECRET` (from the GitHub app, mark as secret)
-   - Optional: `ANTHROPIC_API_KEY` and/or `OPENAI_API_KEY` so users do not have to paste their own
+   - Optional hosted keys so users do not have to paste their own: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `GOOGLE_AI_API_KEY` (or `GEMINI_API_KEY`), `GROQ_API_KEY`, `MISTRAL_API_KEY`, `CEREBRAS_API_KEY`
 3. Redeploy: **Deployments → Retry**, or push a new commit to GitHub.
 
 Until the two GitHub values are set, **Authorize with GitHub** stays off. People can still paste a token.

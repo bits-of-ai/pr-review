@@ -1,6 +1,6 @@
 import { json, errorMessage } from "../../lib/http.js";
 import { getGithubToken } from "../../lib/session.js";
-import { resolveApiKey } from "../../lib/ai.js";
+import { getProvider, missingKeyMessage, resolveApiKey } from "../../lib/providers.js";
 import { resolvePullRequest } from "../../lib/parse-pr.js";
 import { reviewPullRequest } from "../../lib/run-review.js";
 
@@ -8,8 +8,8 @@ export async function onRequestPost({ request, env }) {
   const body = await request.json().catch(() => ({}));
   const token = getGithubToken(request) || String(body.githubToken || "").trim();
   const ref = resolvePullRequest(body.repo, body.number, body.url);
-  const provider = body.provider === "openai" ? "openai" : "anthropic";
-  const model = String(body.model || "").slice(0, 80);
+  const provider = String(body.provider || "");
+  const model = String(body.model || "").slice(0, 160);
   const apiKey = resolveApiKey(env, provider, body.apiKey);
 
   if (!ref) {
@@ -18,17 +18,12 @@ export async function onRequestPost({ request, env }) {
       400,
     );
   }
+  if (!getProvider(provider)) {
+    return json({ error: "Choose a supported AI provider." }, 400);
+  }
   if (!model) return json({ error: "Choose a model." }, 400);
   if (!apiKey) {
-    return json(
-      {
-        error:
-          provider === "openai"
-            ? "Enter an OpenAI API key, or set OPENAI_API_KEY on the server."
-            : "Enter an Anthropic API key, or set ANTHROPIC_API_KEY on the server.",
-      },
-      400,
-    );
+    return json({ error: missingKeyMessage(provider) }, 400);
   }
 
   try {
