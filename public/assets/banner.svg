@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1544" height="500" viewBox="0 0 1544 500" role="img" aria-label="PR Review">
+  <rect width="1544" height="500" fill="#f8f9fa"/>
+  <rect x="0" y="0" width="1544" height="4" fill="#1a73e8"/>
+  <rect x="80" y="176" width="64" height="64" rx="8" fill="#1a73e8"/>
+  <path d="M96 190h22c8 0 14 5.5 14 13s-6 13-14 13h-12v22h-10V190zm10 18h11c3.2 0 5.5-2.2 5.5-5s-2.3-5-5.5-5h-11v10z" fill="#fff"/>
+  <text x="168" y="224" fill="#202124" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="48" font-weight="500">PR Review</text>
+  <text x="168" y="268" fill="#5f6368" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="22">AI pull request reviewer for GitHub</text>
+</svg>
