@@ -1,109 +1,66 @@
 # PR Review
 
-A GitHub pull request reviewer powered by **Claude** or **OpenAI**.
+Review a GitHub pull request with Claude or OpenAI.
 
-The UI is static. The review prompt, GitHub diff fetch, and model calls run in a **Cloudflare Worker**, so visitors cannot read that code in the browser.
+The form you see in the browser is only the website. Fetching the PR, building the review, and calling the AI all run on the server.
 
-## Why Cloudflare Pages (not Netlify, Vercel, or GitHub Pages)
+Live site: [https://pr-review.razonkumar.workers.dev/](https://pr-review.razonkumar.workers.dev/)  
+Code: [https://github.com/bits-of-ai/pr-review](https://github.com/bits-of-ai/pr-review)
 
-| | Cloudflare Pages | Netlify | Vercel | GitHub Pages |
-| --- | --- | --- | --- | --- |
-| Hide review prompt from the browser | Functions, same deploy | Functions (Lambda) | Serverless | No backend |
-| GitHub OAuth + HttpOnly cookie | Native | Extra setup | Extra setup | Not possible alone |
-| Cold starts | Almost none | AWS Lambda | Often fine | n/a |
-| Fits this repo | `functions/` already here | Would rewrite | Would rewrite | UI only, all JS public |
+## How to use it
 
-Use **Cloudflare Pages**. One project serves `public/` and `functions/`.
+1. Sign in with GitHub, or paste a GitHub personal access token.
+2. Paste a PR link, or enter `owner/repo` and the PR number.
+3. Add extra notes if you want (optional).
+4. Pick Claude or OpenAI. Paste an API key unless the host already added one.
+5. Click **Review pull request**. You can copy the result or post it as a PR comment.
 
-**Honest limit:** site visitors will not see `lib/` or `functions/` in DevTools. Anyone with access to this **git repository** still can. Make the GitHub repo **private** if the prompt and server code must stay secret.
-
-## Architecture
-
-```mermaid
-flowchart LR
-  Browser["Browser: public UI only"]
-  Pages["Cloudflare Pages Functions"]
-  GH["GitHub API"]
-  OAuth["GitHub OAuth"]
-  Claude["Anthropic"]
-  OpenAI["OpenAI"]
-
-  Browser -->|"Authorize"| Pages
-  Pages --> OAuth
-  OAuth -->|"callback cookie"| Pages
-  Browser -->|"POST /api/review"| Pages
-  Pages -->|"diff"| GH
-  Pages --> Claude
-  Pages --> OpenAI
-```
-
-## Local development
+## Run it on your computer
 
 ```bash
 cp .dev.vars.example .dev.vars
-# fill GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET (and optional AI keys)
+```
+
+Put your GitHub app ID and secret in `.dev.vars` if you want the **Authorize** button locally. Then:
+
+```bash
 npx wrangler dev --port 4173
+```
+
+Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
+
+```bash
 npm test
 ```
 
-Open http://127.0.0.1:4173. Plain `python3 -m http.server` will not run `/api/*`.
+## Put it on Cloudflare
 
-GitHub OAuth App callback for local: `http://127.0.0.1:4173/api/oauth/callback`.
+The site is hosted on Cloudflare. Connecting this GitHub repo is enough; Cloudflare should use deploy command `npx wrangler deploy`.
 
-## Deploy on Cloudflare
+After the first successful deploy:
 
-This is **not** caused by a missing GitHub client ID or secret. Those are used after the site is live. The build failed because Cloudflare runs `npx wrangler deploy`, which needs `main` and `[assets]` in `wrangler.toml` (now in this repo).
+1. Create a [GitHub OAuth App](https://github.com/settings/applications/new).
+   - Homepage URL: your live site, for example `https://pr-review.razonkumar.workers.dev`
+   - Callback URL: `https://pr-review.razonkumar.workers.dev/api/oauth/callback`
+   - Leave **wildcard matching** and **Device Flow** off.
+2. In Cloudflare, open the project → **Settings → Variables and Secrets** and add:
+   - `GITHUB_CLIENT_ID` (from the GitHub app)
+   - `GITHUB_CLIENT_SECRET` (from the GitHub app, mark as secret)
+   - Optional: `ANTHROPIC_API_KEY` and/or `OPENAI_API_KEY` so users do not have to paste their own
+3. Redeploy: **Deployments → Retry**, or push a new commit to GitHub.
 
-1. **Commit and push** this repo to `bits-of-ai/pr-review` (including `src/index.js` and the updated `wrangler.toml`).
-2. In Cloudflare, keep **Deploy command** as `npx wrangler deploy` if that is already set.
-3. Retry the deployment. It should succeed without GitHub OAuth secrets.
-4. After the site is up, add environment variables (see below), then create the GitHub OAuth App using the live URL.
+Until the two GitHub values are set, **Authorize with GitHub** stays off. People can still paste a token.
 
-[Register a GitHub OAuth App](https://github.com/settings/applications/new):
+Do not put secrets in this git repo.
 
-- Homepage URL: `https://<project>.pages.dev` or your `*.workers.dev` URL
-- Authorization callback URL: `https://<same-host>/api/oauth/callback`
-
-5. After deploy, **Settings → Variables and Secrets** (Production):
-
-| Name | Secret? | Purpose |
-| --- | --- | --- |
-| `GITHUB_CLIENT_ID` | no | OAuth App client ID |
-| `GITHUB_CLIENT_SECRET` | **yes** | OAuth App secret |
-| `OAUTH_SCOPE` | no | default `repo read:user` |
-| `ANTHROPIC_API_KEY` | **yes** | optional hosted Claude key |
-| `OPENAI_API_KEY` | **yes** | optional hosted OpenAI key |
-
-CLI equivalent:
-
-```bash
-npx wrangler secret put GITHUB_CLIENT_SECRET
-npx wrangler secret put ANTHROPIC_API_KEY
-```
-
-Put `GITHUB_CLIENT_ID` in `[vars]` in `wrangler.toml` or in the dashboard.
-
-6. Add the production callback URL on the GitHub OAuth App if you use a custom domain.
-
-Until OAuth secrets exist, **Authorize with GitHub** stays disabled. Users can paste a `repo`-scoped PAT. If you set a hosted AI key, reviewers do not need to paste one.
-
-## Using the app
-
-1. Authorize with GitHub (or paste a PAT — it is stored in an HttpOnly cookie, not `localStorage`).
-2. Paste a PR URL or fill repository + number.
-3. Optional extra context.
-4. Choose Claude or OpenAI (and an API key if the host did not set one).
-5. Review. Copy Markdown or comment on the PR.
-
-## Project layout
+## Folders
 
 ```
-public/             what the browser can download
-src/index.js        Worker: API routes + static assets
-functions/api/      route handlers used by the Worker
-lib/                review prompt, GitHub, AI — not served as static files
-tests/
-wrangler.toml
+public/        the website (what visitors see)
+src/           the server entry (routes the /api calls)
+functions/api/ the code for each /api URL
+lib/           review logic (not shown in the browser)
+tests/         automated tests
 ```
 
 ## Contributing

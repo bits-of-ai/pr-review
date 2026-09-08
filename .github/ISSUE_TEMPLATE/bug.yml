@@ -1,23 +1,41 @@
-name: Bug report
-description: Something does not work as documented
+name: Bug
+description: Something on the site or in a review is wrong
 labels: ["bug"]
 body:
   - type: textarea
     id: what
     attributes:
-      label: What happened
-      description: Expected vs actual behavior.
+      label: What went wrong
+      description: What you expected, and what happened instead.
     validations:
       required: true
   - type: textarea
     id: repro
     attributes:
-      label: How to reproduce
-      description: Do not include tokens or API keys.
+      label: How to repeat it
+      description: Steps, PR link (public only), browser. Do not paste GitHub tokens or AI keys.
     validations:
       required: true
-  - type: input
-    id: env
+  - type: dropdown
+    id: where
     attributes:
-      label: Environment
-      placeholder: Browser, GitHub Pages URL or localhost
+      label: Where
+      options:
+        - Live site (pr-review.razonkumar.workers.dev)
+        - On my computer (wrangler dev)
+        - Tests / GitHub Actions
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      options:
+        - Sign in with GitHub
+        - Personal access token
+        - Loading a pull request
+        - Running a review (Claude / OpenAI)
+        - Copy or comment on the PR
+        - Something else
+    validations:
+      required: true

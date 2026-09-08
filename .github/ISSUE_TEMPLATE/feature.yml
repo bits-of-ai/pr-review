@@ -1,17 +1,17 @@
-name: Feature request
-description: Suggest an improvement
+name: Idea
+description: Suggest a change to the review app
 labels: ["enhancement"]
 body:
   - type: textarea
-    id: problem
+    id: need
     attributes:
-      label: Problem
-      description: What is painful or missing today?
+      label: What is missing
+      description: What you cannot do today, or what is hard.
     validations:
       required: true
   - type: textarea
     id: idea
     attributes:
-      label: Proposal
+      label: What you would like instead
     validations:
       required: true
