@@ -52,26 +52,30 @@ GitHub OAuth App callback for local: `http://127.0.0.1:4173/api/oauth/callback`.
 
 ## Deploy on Cloudflare Pages
 
-1. Create a [Cloudflare](https://dash.cloudflare.com/sign-up) account and install Wrangler: `npx wrangler login`.
-2. [Register a GitHub OAuth App](https://github.com/settings/applications/new):
+Connect the GitHub repo in the dashboard. **Do not set a deploy command.** Cloudflare’s Git integration already uploads `public/` and `functions/`. Running `npx wrangler deploy` in the build will fail (`Missing entry-point to Worker script`).
+
+1. Dashboard → **Workers & Pages** → **Create** → **Pages** → **Import an existing Git repository** → `bits-of-ai/pr-review`.
+2. Build settings (this is the part that was wrong if the log shows `npx wrangler deploy`):
+
+| Field | Value |
+| --- | --- |
+| Framework preset | None |
+| Build command | *empty* |
+| **Deploy command** | **empty — delete `npx wrangler deploy`** |
+| Build output directory | `public` |
+| Root directory | `/` |
+
+3. **Save and retry deployment.** You should see the site at `https://<project>.pages.dev`.
+
+4. [Register a GitHub OAuth App](https://github.com/settings/applications/new):
    - Homepage URL: `https://<project>.pages.dev`
    - Authorization callback URL: `https://<project>.pages.dev/api/oauth/callback`
-3. Create the Pages project (dashboard **Workers & Pages → Create → Pages → Connect to Git**, or CLI):
 
-```bash
-npx wrangler pages project create pr-review
-npx wrangler pages deploy
-```
+Wrangler (`npx wrangler login`, `npx wrangler pages deploy`) is only for deploying from your laptop. You do not need it when Git is connected.
 
-If you connect Git, set:
+If you created a **Worker** instead of a **Pages** project, create a new Pages project with the settings above. This app uses Pages Functions (`functions/`), not a Worker `main` script.
 
-- **Build command:** empty (no build)
-- **Build output directory:** `public`
-- **Root directory:** `/` (repository root)
-
-Wrangler uses `wrangler.toml` (`pages_build_output_dir = "public"`). The `functions/` directory is picked up automatically and is **not** uploaded as static files.
-
-4. In the Pages project **Settings → Environment variables** (Production):
+5. In the Pages project **Settings → Environment variables** (Production):
 
 | Name | Secret? | Purpose |
 | --- | --- | --- |
@@ -90,7 +94,7 @@ npx wrangler pages secret put ANTHROPIC_API_KEY --project-name pr-review
 
 Put `GITHUB_CLIENT_ID` in `[vars]` in `wrangler.toml` or in the dashboard.
 
-5. Add the production callback URL on the GitHub OAuth App if you use a custom domain.
+6. Add the production callback URL on the GitHub OAuth App if you use a custom domain.
 
 Until OAuth secrets exist, **Authorize with GitHub** stays disabled. Users can paste a `repo`-scoped PAT. If you set a hosted AI key, reviewers do not need to paste one.
 

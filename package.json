@@ -7,7 +7,7 @@
   "scripts": {
     "start": "npx wrangler pages dev public --port 4173",
     "test": "node --test tests/*.test.js",
-    "deploy": "npx wrangler pages deploy"
+    "pages:deploy": "npx wrangler pages deploy"
   },
   "engines": {
     "node": ">=20"
