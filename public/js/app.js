@@ -94,6 +94,7 @@ function bind() {
   });
   el("model").addEventListener("change", () => {
     setPrefs({ provider: el("provider").value, model: el("model").value });
+    updateModelSummary();
   });
   el("remember").addEventListener("change", () => {
     setRememberSecrets(el("remember").checked);
@@ -106,6 +107,14 @@ function bind() {
 
   el("copy-btn").addEventListener("click", copyMarkdown);
   el("post-btn").addEventListener("click", postComment);
+
+  el("model-open").addEventListener("click", () => openModelPanel());
+  el("model-close").addEventListener("click", closeModelPanel);
+  el("model-done").addEventListener("click", closeModelPanel);
+  el("model-overlay").addEventListener("click", closeModelPanel);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && isModelPanelOpen()) closeModelPanel();
+  });
 }
 
 function restoreForm() {
@@ -134,6 +143,7 @@ function updateProviderUi() {
   el("api-key-label").textContent = provider.keyLabel;
   el("api-key-docs").href = provider.docs;
   el("api-key").value = getProviderKey(provider.id);
+  updateModelSummary();
 }
 
 function updateOauthButton() {
@@ -229,6 +239,7 @@ async function runReview() {
     if (!ref) throw new Error("Enter a repository (owner/repo) and pull request number, or paste a PR URL.");
     const hosted = state.config.hostedKeys?.[providerId];
     if (!apiKey && !hosted) {
+      openModelPanel(el("api-key"));
       throw new Error(`Enter your ${getProvider(providerId).keyLabel}.`);
     }
 
@@ -365,4 +376,38 @@ function showBanner(message, kind) {
 
 function hideBanner() {
   el("banner").hidden = true;
+}
+
+function shortLabel(text) {
+  return String(text || "").replace(/\s*\([^)]*\)\s*/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function updateModelSummary() {
+  const provider = getProvider(el("provider").value);
+  const model = provider.models.find((item) => item.id === el("model").value) || provider.models[0];
+  el("model-summary").textContent = `${shortLabel(provider.label)} · ${shortLabel(model.label)}`;
+}
+
+function isModelPanelOpen() {
+  return el("model-panel").classList.contains("is-open");
+}
+
+function openModelPanel(focusEl) {
+  el("model-overlay").hidden = false;
+  el("model-panel").classList.add("is-open");
+  el("model-panel").setAttribute("aria-hidden", "false");
+  el("model-open").setAttribute("aria-expanded", "true");
+  document.body.classList.add("drawer-open");
+  const target = focusEl || el("provider");
+  requestAnimationFrame(() => target.focus());
+}
+
+function closeModelPanel() {
+  if (!isModelPanelOpen()) return;
+  el("model-overlay").hidden = true;
+  el("model-panel").classList.remove("is-open");
+  el("model-panel").setAttribute("aria-hidden", "true");
+  el("model-open").setAttribute("aria-expanded", "false");
+  document.body.classList.remove("drawer-open");
+  el("model-open").focus();
 }
