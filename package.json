@@ -5,11 +5,14 @@
   "description": "AI reviewer for GitHub pull requests, hosted on Cloudflare Pages.",
   "type": "module",
   "scripts": {
-    "start": "npx wrangler dev --port 4173",
+    "start": "wrangler dev --port 4173 --ip 127.0.0.1",
     "test": "node --test tests/*.test.js",
     "pages:deploy": "npx wrangler deploy"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "wrangler": "^4.86.0"
   }
 }
