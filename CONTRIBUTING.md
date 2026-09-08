@@ -6,7 +6,7 @@ Thanks for helping. Keep changes small and easy to review.
 
 ```bash
 cp .dev.vars.example .dev.vars
-npx wrangler dev --port 4173
+npm start
 npm test
 ```
 
@@ -18,19 +18,24 @@ Do not commit `.dev.vars` or any API keys.
 
 | You want to change | Open this |
 | --- | --- |
-| How the review is written | `lib/prompt.js` |
+| What the model looks for (focus, nits, verdicts) | `lib/prompt.js` |
+| The JSON the model must return | `lib/review-schema.js` and `lib/review-parse.js` |
 | How GitHub is called | `lib/github.js` |
-| How an AI provider is called | `lib/ai.js`, `lib/providers.js` |
+| How an AI provider is called | `lib/ai.js` |
+| Add a provider or hosted key name | `lib/providers.js` **and** `public/js/models.js` (same `id`) |
 | Which files are skipped in the diff | `lib/diff.js` |
+| The review pipeline order | `lib/run-review.js` |
 | A `/api/...` URL | `functions/api/` and `src/index.js` |
 | Layout or wording | `public/index.html`, `public/css/app.css` |
 | Button clicks and form behavior | `public/js/app.js` |
+
+The **Notes** field on the form is `extraContext`. It is injected as “Reviewer notes (highest priority)” in `lib/prompt.js`.
 
 Keep review logic out of `public/`. That folder is sent to every visitor.
 
 ## Tests
 
-After changing parsing, diffs, or the review JSON, add or update a test in `tests/` and run:
+After changing parsing, diffs, prompts, or the review JSON, add or update a test in `tests/` and run:
 
 ```bash
 npm test

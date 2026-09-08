@@ -194,7 +194,7 @@ code {
 .page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 20px 24px 40px;
+  padding: 20px 24px 24px;
 }
 
 .sheet {
@@ -325,6 +325,10 @@ summary:focus-visible {
   align-items: center;
   gap: 12px;
   margin-top: 16px;
+}
+
+.privacy {
+  margin-top: 10px;
 }
 
 .btn {

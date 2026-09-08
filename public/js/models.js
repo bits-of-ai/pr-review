@@ -1,3 +1,4 @@
+/** UI model catalog. New provider ids also need an entry in lib/providers.js. */
 export const PROVIDERS = [
   {
     id: "anthropic",

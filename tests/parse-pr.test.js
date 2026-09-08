@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { parsePullRequestRef, resolvePullRequest } from "../lib/parse-pr.js";
+import * as browserParse from "../public/js/parse-pr.js";
 
 describe("parsePullRequestRef", () => {
   it("parses github.com pull URLs", () => {
@@ -50,5 +51,22 @@ describe("resolvePullRequest", () => {
 
   it("rejects a bare number without a repository", () => {
     assert.equal(resolvePullRequest("", "12"), null);
+  });
+});
+
+describe("browser parse-pr copy", () => {
+  it("matches the server parser", () => {
+    const samples = [
+      "https://github.com/acme/widgets/pull/42",
+      "acme/widgets#99",
+      "",
+    ];
+    for (const sample of samples) {
+      assert.deepEqual(browserParse.parsePullRequestRef(sample), parsePullRequestRef(sample));
+    }
+    assert.deepEqual(
+      browserParse.resolvePullRequest("acme/widgets", "12"),
+      resolvePullRequest("acme/widgets", "12"),
+    );
   });
 });

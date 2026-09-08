@@ -1,3 +1,4 @@
+/** Keep in sync with lib/parse-pr.js (server copy). The browser cannot import lib/. */
 const PR_URL =
   /(?:https?:\/\/)?(?:www\.)?github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i;
 const OWNER_REPO_NUMBER = /^([^/\s]+)\/([^#\s/]+)(?:#|\/pull\/|\/)(\d+)$/i;
